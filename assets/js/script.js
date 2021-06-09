@@ -37,6 +37,9 @@ var getUserRepos = function(){
 });
 };
 */
+/*
+Here we are targetting all the user accounts but by hardcoding which account we want to target. 
+We have access to all the accounts but we select the user account by hardcoding the name of the accont in the function as shown below. 
 
 var getUserRepos = function(user){
     //format the github API URL 
@@ -50,4 +53,43 @@ var getUserRepos = function(user){
     });
 };
 
-getUserRepos("ninisidhu");
+getUserRepos("ninisidhu"); //hardcoded a singluar username. 
+
+*/
+
+
+//Selecting elements from form and linking it to global variables on JS
+var userFormEl = document.querySelector("#user-form");
+var nameInputEl = document.querySelector("#username");
+
+//getUserRepos function that fetches data from the API. 
+var getUserRepos = function(user){
+    //format the github API URL 
+    var apiUrl = "https://api.github.com/users/"+ user + "/repos";
+
+    //make request to the url 
+    fetch(apiUrl).then(function(response) {
+        response.json().then(function(data){
+            console.log(data);
+        });
+    });
+};
+
+//Creating a form submit handler which will be executed upon a form submission browser event 
+var formSubmitHandler = function (event){
+    event.preventDefault();
+
+    //get value form the user input and put it in the getUserRepo function instead of us hardcoding the name 
+    var username = nameInputEl.value.trim(); //trim is useful to remove any extra spaces that may have been accidently put in by the user! 
+    
+    //when user inputs something in the text push it to the function getUserRepos
+    if(username) {
+        getUserRepos(username); //entered username gets pushed into the function 
+        nameInputEl.value=""; //enterd field is emptied before getting executed again
+    }else{
+        alert("Please enter a GitHub username"); //in the event that the user does not enter anything, we want to alert the user! 
+    }
+
+};
+
+userFormEl.addEventListener("submit", formSubmitHandler);
