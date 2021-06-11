@@ -62,16 +62,46 @@ getUserRepos("ninisidhu"); //hardcoded a singluar username.
 var userFormEl = document.querySelector("#user-form");
 var nameInputEl = document.querySelector("#username");
 
+var repoContainerEl = document.querySelector("#repos-container");
+var repoSearchTerm = document.querySelector("#repo-search-term");
+
 //getUserRepos function that fetches data from the API. 
 var getUserRepos = function(user){
     //format the github API URL 
     var apiUrl = "https://api.github.com/users/"+ user + "/repos";
 
+    /*
     //make request to the url 
     fetch(apiUrl).then(function(response) {
         response.json().then(function(data){
-            console.log(data);
+            displayRepos(data,user); //The data is fetched, then converted to JSON. It is then sent from getUserRepos() to displayRepos(). 
         });
+    });*/
+
+    //We need to control what the user will see when we have an error. 200 code means fetching was successful; 404 means that is was unsuccesful 
+    //We will update the fetch to respond to a request that is 404 (not found)!
+
+    /* API PROMISE 
+
+    An API Promise is PENDING when make the request. 
+    WHEN Fulfilled --> .then(function(response){return response.json()})
+    WHEN Rejected --> .catch(function(error){console.log(error))}
+
+    */
+
+    fetch(apiUrl).then(function(response){
+        
+        if(response.ok){ //When the status code is something in 200; the ok property will be true! 
+            response.json().then(function(data){
+                displayRepos(data,user);
+            });
+        }else{
+            alert("Error: GitHub User not found!");
+        }
+    })
+    //we also have to inform the user if the connectivity is not working. ".catch" is the fetch API's way of handling Network Errors. 
+    .catch(function(error){
+        alert("Unable to Connect to GitHub!");
     });
 };
 
@@ -88,6 +118,49 @@ var formSubmitHandler = function (event){
         nameInputEl.value=""; //enterd field is emptied before getting executed again
     }else{
         alert("Please enter a GitHub username"); //in the event that the user does not enter anything, we want to alert the user! 
+    };
+
+};
+
+//Now we need to fetch specific data from the respository. Namely we need the Name, Open Issue count and the login property of the owner.
+//Also keep in mind that the data fetched is in an array and the data within that array is also in an array. 
+
+var displayRepos = function(repos, searchTerm){ //searchTerm is a public abstract class built in JS. Search criteria are expressed as a tree of search term. 
+   
+    //We have to check for situations when a user is found but they may not have any repos. We have to tell the user this!
+    if(repos.length===0){
+        reposContainerEl.textContent = "No repositories found.";
+        return; 
+    }
+
+   
+    /* console.log(repos); //repos takes the repos under repositories and console logs the data. 
+    console.log(searchTerm);*/
+
+    //clearing old content from previous user searches 
+    repoContainerEl.textContent = "";
+    repoSearchTerm.textContent = searchTerm; //This will return the value of the Search Term back to repoSearchTerm which will return it to the span in HTML
+
+    //Now lets show the list of the repositories that a selected user may have 
+    //We have to loop over repos as we may have more than one repo 
+
+    for(var i=0; i<repos.length; i++){
+        //format the repo name in a specific way 
+        var repoName = repos[i].owner.login + "/" + repos[i].name;
+
+        //create a container for each of the repo 
+        var repoEl = document.createElement("div");
+        repoEl.classList = "list-item flex-row justify-space-between align center"
+
+        //create a span element to hold the repository name 
+        var titleEl = document.createElement("span");
+        titleEl.textContent = repoName;
+
+        //append to container 
+        repoEl.appendChild(titleEl); //appending the titleEl back to repoEl 
+
+        //append the repoEl to the DOM 
+        repoContainerEl.appendChild(repoEl);
     }
 
 };
