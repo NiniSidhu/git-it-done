@@ -1,6 +1,7 @@
 // This JS is used to fetch the Repo Issues specifically 
 
 var issueContainerEl = document.querySelector("#issues-container");
+var limitWarningEl = document.querySelector("#limit-warning");
 
 var getRepoIssues = function(repo){
     var apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc"; //url where we are fetching the data
@@ -9,6 +10,11 @@ var getRepoIssues = function(repo){
         if(response.ok){
             response.json().then(function(data){
                 displayIssues(data); //this will pass the fetched information to the next function! 
+
+                //We may get additional links in the header section of the api. These links indicate if there is additional data to be displayed to the user
+                if (response.headers.get("Links")){
+                   displayWarning(repo); //if there are more than 30 links, then the displayWarning function will be activated. 
+                }
             });
         }else{
             alert("There was a problem with your request");
@@ -55,6 +61,18 @@ var displayIssues = function(issues){
         issueEl.appendChild(typeEl);
         issueContainerEl.appendChild(issueEl);
     }
+};
+
+var displayWarning = function(repo){
+    //add text to warning container 
+    limitWarningEl.textContent = "To see more than 30 issues, visit ";
+    var linkEl = document.createElement("a");
+    linkEl.textContent = "See more issues on GitHub.com";
+    linkEl.setAttribute("href","https://github.com/" + repo + "/issues");
+    linkEl.setAttribute("target", "_blank");
+
+    //append to the warning container
+    limitWarningEl.appendChild(linkEl);
 };
 
 getRepoIssues("facebook/react");
