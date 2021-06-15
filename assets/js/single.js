@@ -1,7 +1,25 @@
 // This JS is used to fetch the Repo Issues specifically 
 
+var repoNameEl = document.querySelector("#repo-name")
 var issueContainerEl = document.querySelector("#issues-container");
 var limitWarningEl = document.querySelector("#limit-warning");
+
+var getRepoName = function(){
+    var queryString = document.location.search; //in the location objext exists a query string called search which stores the user search 
+    //Now we will split the user search to find the repo name using the SPLIT function 
+
+    var repoName = queryString.split("=")[1];
+    
+    //Checking if the user does infact select a repo 
+    if(repoName){
+        //display repo name on the page
+        repoNameEl.textContent = repoName;  
+        getRepoIssues(repoName);
+    }else{
+        //if no repo was given, redirect to the homepage
+        document.location.replace("./index.html");
+    }  
+};
 
 var getRepoIssues = function(repo){
     var apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc"; //url where we are fetching the data
@@ -20,8 +38,6 @@ var getRepoIssues = function(repo){
             alert("There was a problem with your request");
         }
     });
-
-    
 };
 
 //This function is used for Issues only 
@@ -75,4 +91,4 @@ var displayWarning = function(repo){
     limitWarningEl.appendChild(linkEl);
 };
 
-getRepoIssues("facebook/react");
+getRepoName();

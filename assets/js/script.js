@@ -148,9 +148,12 @@ var displayRepos = function(repos, searchTerm){ //searchTerm is a public abstrac
         //format the repo name in a specific way 
         var repoName = repos[i].owner.login + "/" + repos[i].name;
 
-        //create a container for each of the repo 
-        var repoEl = document.createElement("div");
-        repoEl.classList = "list-item flex-row justify-space-between align center"
+        //create a container for each of the repo and linking it to a new page. 
+        var repoEl = document.createElement("a");
+        repoEl.classList = "list-item flex-row justify-space-between align center";
+        repoEl.setAttribute("href", "./single-repo.html?repo="+ repoName); //the "?repo" suggests to search for a repo and that name is stored in our varibale repoName
+
+        //we decode and retrieve the requested user name in the new js file. 
 
         //create a span element to hold the repository name 
         var titleEl = document.createElement("span");
